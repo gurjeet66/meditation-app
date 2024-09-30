@@ -10,10 +10,10 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     required this.child,
     required this.onPressed,
-    Key? key,
+    super.key,
     this.width = 150,
     this.height = 50,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,10 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          foregroundColor: color1, backgroundColor: color2,
+          
+          foregroundColor: color1, backgroundColor: color7,
           shape: RoundedRectangleBorder(
+            
               borderRadius: BorderRadius.circular(12)), // Text color
           // Button size
         ),

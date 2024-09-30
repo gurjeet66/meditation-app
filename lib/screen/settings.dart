@@ -2,6 +2,8 @@ import 'package:firebaseseries/screen/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
@@ -16,7 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Settings",
           style: TextStyle(
               color: color2, fontSize: 30, fontWeight: FontWeight.w600),
@@ -29,7 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 30,
                 decoration: BoxDecoration(
                     color: color2, borderRadius: BorderRadius.circular(12)),
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_back,
                   color: color1,
                 )),
@@ -41,10 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
-            Text(
+            const Text(
               "Notifications",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
@@ -58,8 +60,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               "Sounds Settings",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
@@ -72,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             buildSectionHeader('Language'),
             Container(
@@ -80,12 +82,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: color2)),
               child: ListTile(
-                title: Text('Select'),
+                title: const Text('Select'),
                 tileColor: Colors.grey[200],
-                trailing: Icon(Icons.arrow_forward_ios),
+                trailing: const Icon(Icons.arrow_forward_ios),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             buildSectionHeader('Theme'),
             buildRadioListTile(
@@ -108,8 +110,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               "Privacy Settings",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
@@ -122,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             // Help & Support
             buildSectionHeader('Help & Support'),
             buildButton(
@@ -132,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Handle contact support
               },
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             buildButton(
               context,
               title: 'FAQs',
@@ -154,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SwitchListTile(
       title: Text(
         title,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
       value: value,
       onChanged: onChanged,
@@ -180,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -190,13 +192,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 48),
+        minimumSize: const Size(double.infinity, 48),
         backgroundColor: Colors.grey[200],
         elevation: 0,
       ),
       child: Text(
         title,
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
       ),
     );
   }

@@ -1,56 +1,39 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class MeditationStep extends StatelessWidget {
-  final String stepTitle;
-  final String description;
-  final String imagePath;
+class MeditationList {
+  final String success;
+  final String message;
+  final List<MeditationDetail> details;
 
-  const MeditationStep({
-    Key? key,
-    required this.stepTitle,
-    required this.description,
-    required this.imagePath,
-  }) : super(key: key);
+  MeditationList({required this.success, required this.message, required this.details});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            stepTitle,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            description,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
+  factory MeditationList.fromJson(Map<String, dynamic> json) {
+    var list = json['details'] as List;
+    List<MeditationDetail> detailsList = list.map((i) => MeditationDetail.fromJson(i)).toList();
+
+    return MeditationList(
+      success: json['success'],
+      message: json['message'],
+      details: detailsList,
+    );
+  }
+}
+
+class MeditationDetail {
+  final String id;
+  final String name;
+  final List<String> steps;
+
+  MeditationDetail({required this.id, required this.name, required this.steps});
+
+  factory MeditationDetail.fromJson(Map<String, dynamic> json) {
+    var list = json['steps'] as List;
+    List<String> stepsList = list.map((i) => i as String).toList();
+
+    return MeditationDetail(
+      id: json['id'],
+      name: json['name'],
+      steps: stepsList,
     );
   }
 }

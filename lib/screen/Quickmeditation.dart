@@ -1,8 +1,7 @@
 import 'package:firebaseseries/screen/Homescreen.dart';
-import 'package:firebaseseries/screen/Meditation.dart';
+
 import 'package:firebaseseries/screen/one.dart';
 import 'package:firebaseseries/screen/quickmeditation2.dart';
-import 'package:firebaseseries/screen/quickmeditation3.dart';
 import 'package:firebaseseries/screen/quickmeditation4.dart';
 import 'package:firebaseseries/screen/utils/app_colors.dart';
 import 'package:firebaseseries/screen/widgets/button1.dart';
@@ -49,24 +48,30 @@ class _QuickmeditationState extends State<Quickmeditation> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SessionBoxScreen3(
-              titletext: "High Performance",
-              subtitletext: "Meditation",
-              lowertext: "Meditation: 15-20 minutes",
-              onTap: () {},
-              Image1: "assets/Depth 4, Frame 1.png"),
+          SizedBox(
+            height: 15,
+          ),
           Padding(
-            padding: const EdgeInsets.only(left: 20, top: 20),
+            padding: const EdgeInsets.all(8.0),
+            child: SessionBoxScreen3(
+                titletext: "High Performance",
+                subtitletext: "Meditation",
+                lowertext: "Meditation: 15-20 minutes",
+                onTap: () {},
+                Image1: "assets/Depth 4, Frame 1.png"),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, top: 20),
             child: Text(
-              "Visualization Meditation with\n Surya Bhedana (Right Nostril\n Breathing)",
+              "Visualization Meditation with\nSurya Bhedana (Right Nostril\nBreathing)",
               style: TextStyle(
                   fontSize: 22, fontWeight: FontWeight.w700, color: color2),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 10),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, top: 10),
             child: Text(
-                "This meditation combines powerful\n visualization techniques with Surya Bhedana \npranayama to energize the body, sharpen\n focus, and enhance mental clarity.\n Visualization helps athletes mentally rehearse \ntheir performance, creating a mental\n blueprint for success, while Surya Bhedana\n increases alertness and energy levels.",
+                "This meditation combines powerful\nvisualization techniques with Surya Bhedana \npranayama to energize the body, sharpen\nfocus, and enhance mental clarity.\nVisualization helps athletes mentally rehearse \ntheir performance, creating a mental\nblueprint for success, while Surya Bhedana\nincreases alertness and energy levels.",
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w400, color: color2)),
           ),
@@ -75,7 +80,7 @@ class _QuickmeditationState extends State<Quickmeditation> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                const Expanded(
                     child: Text(
                   " Enable Voice Guidance",
                   style: TextStyle(
@@ -95,7 +100,7 @@ class _QuickmeditationState extends State<Quickmeditation> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Padding(
@@ -103,12 +108,12 @@ class _QuickmeditationState extends State<Quickmeditation> {
             child: CustomButton(
                 height: 50,
                 width: 350,
-                child: Text("Start"),
+                child: const Text("Start"),
                 onPressed: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MeditationScreen()));
+                          builder: (context) => const quickmeditation4()));
                 }),
           ),
         ],

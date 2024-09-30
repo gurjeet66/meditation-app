@@ -5,16 +5,16 @@ class PlayCard extends StatefulWidget {
   final String title;
   final String subtitle;
   final String imageUrl;
-  final List<MeditationStep>
-      step; // Make sure this references the correct MeditationStep
+  
+       // Make sure this references the correct MeditationStep
 
   const PlayCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.imageUrl,
-    required this.step,
-  }) : super(key: key);
+    
+  });
 
   @override
   State<PlayCard> createState() => _PlayCardState();
@@ -23,8 +23,8 @@ class PlayCard extends StatefulWidget {
 class _PlayCardState extends State<PlayCard> {
   @override
   Widget build(BuildContext context) {
-    double _currentPosition = 38.0; // Current playback position
-    double _maxDuration = 200.0; // Total duration of the audio
+    double currentPosition = 38.0; // Current playback position
+    double maxDuration = 200.0; // Total duration of the audio
 
     return SingleChildScrollView(
       child: Container(
@@ -36,24 +36,24 @@ class _PlayCardState extends State<PlayCard> {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 10,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             // Title
             Text(
               widget.title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18.0,
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Image Section
             Center(
               child: ClipRRect(
@@ -66,19 +66,19 @@ class _PlayCardState extends State<PlayCard> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Subtitle
             Center(
               child: Text(
                 widget.subtitle,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16.0,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            SizedBox(height: 4.0),
+            const SizedBox(height: 4.0),
             // Source
             Center(
               child: Text(
@@ -89,7 +89,7 @@ class _PlayCardState extends State<PlayCard> {
                 ),
               ),
             ),
-            SizedBox(height: 30.0),
+            const SizedBox(height: 30.0),
 
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
@@ -98,49 +98,49 @@ class _PlayCardState extends State<PlayCard> {
                     SliderComponentShape.noOverlay, // Removes the overlay
               ),
               child: Slider(
-                value: _currentPosition,
+                value: currentPosition,
                 min: 0,
-                max: _maxDuration,
+                max: maxDuration,
                 activeColor: Colors.black,
                 inactiveColor: Colors.grey[300],
                 onChanged: (value) {
                   setState(() {
-                    _currentPosition = value;
+                    currentPosition = value;
                     // Update the audio playback position here
                   });
                 },
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Playback Controls
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.skip_previous, size: 30),
+                  icon: const Icon(Icons.skip_previous, size: 30),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.fast_rewind, size: 30),
+                  icon: const Icon(Icons.fast_rewind, size: 30),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.play_circle_fill,
+                  icon: const Icon(Icons.play_circle_fill,
                       size: 50, color: Colors.blue),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.fast_forward, size: 30),
+                  icon: const Icon(Icons.fast_forward, size: 30),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.skip_next, size: 30),
+                  icon: const Icon(Icons.skip_next, size: 30),
                 ),
               ],
             ),
             // Meditation Steps
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Pass the steps here
           ],
         ),

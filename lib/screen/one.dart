@@ -70,7 +70,7 @@ class _SecondScreenState extends State<SecondScreen> {
               child: Row(
                 children: [
                   name(topic_name: "Pranayam (Breath Control)"),
-                  SizedBox()
+                  const SizedBox()
                 ],
               ),
             ),
@@ -89,9 +89,9 @@ class _SecondScreenState extends State<SecondScreen> {
               padding: const EdgeInsets.all(8.0),
               child: audio_name(name: 'Pre-Match Stress'),
             ),
-            Text('Health', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
-            Container(
+            const Text('Health', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            SizedBox(
               width: mywidth / 1.2,
               child: Column(
                 children: [
@@ -110,33 +110,33 @@ class _SecondScreenState extends State<SecondScreen> {
                     min: 0.0,
                     max: 1.0,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // Previous Button
                       IconButton(
-                        icon: Icon(Icons.skip_previous, size: 50, color: Colors.black),
+                        icon: const Icon(Icons.skip_previous, size: 50, color: Colors.black),
                         onPressed: _previous,
                       ),
                       // Backward Button
                       IconButton(
-                        icon: Icon(Icons.fast_rewind, size: 40, color: Colors.black),
+                        icon: const Icon(Icons.fast_rewind, size: 40, color: Colors.black),
                         onPressed: _backward,
                       ),
                       // Play/Pause Button
                       IconButton(
-                        icon: Icon(isPlaying ? Icons.pause : Icons.play_circle, size: 60, color: Color.fromARGB(255, 7, 0, 217)),
+                        icon: Icon(isPlaying ? Icons.pause : Icons.play_circle, size: 60, color: const Color.fromARGB(255, 7, 0, 217)),
                         onPressed: _playPause,
                       ),
                       // Forward Button
                       IconButton(
-                        icon: Icon(Icons.fast_forward, size: 40, color: Colors.black),
+                        icon: const Icon(Icons.fast_forward, size: 40, color: Colors.black),
                         onPressed: _forward,
                       ),
                       // Next Button
                       IconButton(
-                        icon: Icon(Icons.skip_next, size: 50, color: Colors.black),
+                        icon: const Icon(Icons.skip_next, size: 50, color: Colors.black),
                         onPressed: _next,
                       ),
                     ],

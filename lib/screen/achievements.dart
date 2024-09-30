@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebaseseries/model/meditationSession.dart';
 import 'package:firebaseseries/screen/utils/app_colors.dart';
 import 'package:firebaseseries/screen/widgets/button1.dart';
 import 'package:firebaseseries/screen/widgets/button3.dart';
@@ -5,7 +7,65 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class AchievementScreen extends StatelessWidget {
+class AchievementScreen extends StatefulWidget {
+  const AchievementScreen({super.key});
+
+  @override
+  State<AchievementScreen> createState() => _AchievementScreenState();
+}
+
+class _AchievementScreenState extends State<AchievementScreen> {
+  int totalMeditationTime = 0;
+  int totalMeditationDays = 0;
+  int currentStreakDays = 0;
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  List<MeditationSession> _sessions = [];
+   @override
+  void initState() {
+    super.initState();
+    _fetchTotalTimeAndDays();
+  }
+Future<void> _fetchTotalTimeAndDays() async {
+  DatabaseReference _dbRef = FirebaseDatabase.instance
+      .ref()
+      .child("users")
+      .child("userId")
+      .child("meditation_session");
+  
+  _dbRef.once().then((DatabaseEvent snapshot) {
+    Map<dynamic, dynamic> data = snapshot.snapshot.value as Map<dynamic, dynamic>;
+
+    setState(() {
+      _sessions = data.entries.map((entry) {
+        return MeditationSession.fromMap(entry.value);
+      }).toList();
+
+      // Calculate total time and days
+      totalMeditationTime = _sessions.fold(0, (sum, session) => sum + session.timeSpent);
+      totalMeditationDays = _sessions.length;
+
+      // Calculate current streak
+      if (_sessions.isNotEmpty) {
+        _sessions.sort((a, b) => a.date.compareTo(b.date)); // Sort by date
+        DateTime lastDate = _sessions.last.date; // Most recent session
+        currentStreakDays = 1; // Start with 1 for the last day
+
+        for (int i = _sessions.length - 2; i >= 0; i--) {
+          DateTime currentDate = _sessions[i].date;
+          if (lastDate.difference(currentDate).inDays == 1) {
+            currentStreakDays++;
+            lastDate = currentDate;
+          } else {
+            break; // Streak is broken
+          }
+        }
+      } else {
+        currentStreakDays = 0; // No sessions means no streak
+      }
+    });
+  });
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,18 +74,18 @@ class AchievementScreen extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-                color: Color(0xff2C3E50),
+                color: const Color(0xff2C3E50),
                 borderRadius: BorderRadius.circular(12)),
             child: GestureDetector(
               onTap: () {
                 Navigator.pop(context);
               },
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_back,
                 color: color1,
               ),
             )),
-        title: Text(
+        title: const Text(
           "Achievements",
           style: TextStyle(
             fontSize: 30,
@@ -42,23 +102,23 @@ class AchievementScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               '"Success is no accident. It is hard work, perseverance, learning, studying, sacrifice and most of all, love of what you are doing or learning to do." - Pelé',
               style: TextStyle(
                 fontSize: 16,
                 color: color2,
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Latest Achievement",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 10),
-            Container(
+            const SizedBox(height: 10),
+            SizedBox(
               width: 390,
               height: 80,
               child: Row(
@@ -71,101 +131,98 @@ class AchievementScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Column(
+                   Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Completed 7 Days of Meditation",
+                          "Completed ${_sessions.length} Days of Meditation",
                           style: TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 16),
                         ),
-                        Text("Earned on: 2023-09-25"),
+                        
                       ])
                 ],
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Meditation Champion",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),
             ),
-            Text(
-              "Completed 100 sessions",
+             Text(
+              "Completed ${_sessions.length} sessions",
               style: TextStyle(fontSize: 14.0),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               "Streak Master",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),
             ),
-            Text(
-              "Maintained a 30-day streak",
+             Text(
+              "Maintained a $currentStreakDays streak",
               style: TextStyle(fontSize: 14.0),
             ),
-            SizedBox(height: 10),
-            Text(
-              "Mindful Athlete",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16.0,
-              ),
-            ),
-            Text(
-              "Practiced 20 sports-focused meditations",
-              style: TextStyle(fontSize: 14.0),
-            ),
-            SizedBox(height: 30),
-            Text(
-              "Badges and Awards",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              BadgeWidget(
-                label: "Gold Medal",
-                Imagepath: "assets/ach.png",
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              BadgeWidget(
-                label: "Silver Star",
-                Imagepath: "assets/star.png",
-              ),
-            ]),
-            SizedBox(
-              height: 8,
-            ),
-            Row(children: [
-              BadgeWidget(
-                label: "Bronze Trophy",
-                Imagepath: "assets/star.png",
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              BadgeWidget(
-                label: "Participation Badge",
-                Imagepath: "assets/Calendar 2.png",
-              ),
-            ]),
-            Spacer(),
+            const SizedBox(height: 10),
+            // const Text(
+            //   "Mindful Athlete",
+            //   style: TextStyle(
+            //     fontWeight: FontWeight.bold,
+            //     fontSize: 16.0,
+            //   ),
+            // ),
+            
+            const SizedBox(height: 30),
+            // const Text(
+            //   "Badges and Awards",
+            //   style: TextStyle(
+            //     fontWeight: FontWeight.bold,
+            //     fontSize: 18.0,
+            //   ),
+            // ),
+            // const SizedBox(height: 10),
+            // Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            //   BadgeWidget(
+            //     label: "Gold Medal",
+            //     Imagepath: "assets/ach.png",
+            //   ),
+            //   const SizedBox(
+            //     width: 5,
+            //   ),
+            //   BadgeWidget(
+            //     label: "Silver Star",
+            //     Imagepath: "assets/star.png",
+            //   ),
+            // ]),
+            // const SizedBox(
+            //   height: 8,
+            // ),
+            // Row(children: [
+            //   BadgeWidget(
+            //     label: "Bronze Trophy",
+            //     Imagepath: "assets/star.png",
+            //   ),
+            //   const SizedBox(
+            //     width: 5,
+            //   ),
+            //   BadgeWidget(
+            //     label: "Participation Badge",
+            //     Imagepath: "assets/Calendar 2.png",
+            //   ),
+            // ]),
+            const Spacer(),
             CustomButton(
                 height: 50,
                 width: 358,
-                child: Text(
+                child: const Text(
                   "Share your Achievements",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
@@ -181,7 +238,7 @@ class BadgeWidget extends StatelessWidget {
   final String label;
   final String Imagepath;
 
-  BadgeWidget({required this.label, required this.Imagepath});
+  const BadgeWidget({super.key, required this.label, required this.Imagepath});
 
   @override
   Widget build(BuildContext context) {
@@ -192,16 +249,16 @@ class BadgeWidget extends StatelessWidget {
           width: 172,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            color: Color(0xff2C3E50),
+            color: const Color(0xff2C3E50),
           ),
           child: Padding(
             padding: const EdgeInsets.only(left: 10, top: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 24, width: 24, child: Image.asset(Imagepath)),
-                SizedBox(height: 8),
-                Text(label, style: TextStyle(fontSize: 12, color: color1)),
+                SizedBox(height: 24, width: 24, child: Image.asset(Imagepath)),
+                const SizedBox(height: 8),
+                Text(label, style: const TextStyle(fontSize: 12, color: color1)),
               ],
             ),
           ),

@@ -11,14 +11,14 @@ class SessionBoxScreen extends StatefulWidget {
   final VoidCallback onpressed;
 
   const SessionBoxScreen({
-    Key? key,
+    super.key,
     required this.labelImagePath,
     required this.vectorImagePath,
     required this.titletext,
     required this.subtitletext,
     required this.lowertext,
     required this.onpressed,
-  }) : super(key: key);
+  });
 
   @override
   State<SessionBoxScreen> createState() => _SessionBoxScreenState();
@@ -46,7 +46,7 @@ class _SessionBoxScreenState extends State<SessionBoxScreen> {
               children: [
                 Text(
                   widget.titletext,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: color1,
@@ -54,7 +54,7 @@ class _SessionBoxScreenState extends State<SessionBoxScreen> {
                 ),
                 Text(
                   widget.subtitletext,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: color1,
@@ -62,7 +62,7 @@ class _SessionBoxScreenState extends State<SessionBoxScreen> {
                 ),
                 Text(
                   widget.lowertext,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: color1,

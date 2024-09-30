@@ -26,21 +26,21 @@ class _StepsState extends State<Steps> {
           Image.asset(widget.Image),
           Text(
             widget.Title,
-            style: TextStyle(
+            style: const TextStyle(
                 color: color2, fontSize: 18, fontWeight: FontWeight.w500),
           ),
           Row(children: [
             Container(
               height: 5,
               width: 5,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: color2,
               ),
             ),
             Text(
               widget.description1,
-              style: TextStyle(
+              style: const TextStyle(
                   color: color2, fontSize: 16, fontWeight: FontWeight.w400),
             ),
           ]),
@@ -48,14 +48,14 @@ class _StepsState extends State<Steps> {
             Container(
               height: 5,
               width: 5,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: color2,
               ),
             ),
             Text(
               widget.description1,
-              style: TextStyle(
+              style: const TextStyle(
                   color: color2, fontSize: 16, fontWeight: FontWeight.w400),
             ),
           ]),

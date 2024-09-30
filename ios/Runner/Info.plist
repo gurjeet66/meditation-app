@@ -14,6 +14,9 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>firebaseseries</string>
+	<key>NSAppleMusicUsageDescription</key>
+    <string>We use Apple Music to access your music library.</string>
+
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

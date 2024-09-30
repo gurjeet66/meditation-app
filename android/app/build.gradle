@@ -49,6 +49,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+    
 
     buildTypes {
         release {
@@ -74,3 +75,4 @@ configurations.all {
         force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
     }
 }
+

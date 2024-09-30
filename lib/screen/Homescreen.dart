@@ -1,12 +1,24 @@
-import 'package:firebaseseries/screen/Meditation1.dart';
-import 'package:firebaseseries/screen/Meditation2.dart';
-import 'package:firebaseseries/screen/Meditation3.dart';
-import 'package:firebaseseries/screen/Meditation4.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebaseseries/auth/providers.dart';
+import 'package:firebaseseries/model/meditationSession.dart';
+import 'package:firebaseseries/model/usermodel.dart';
+import 'package:firebaseseries/screen/Quickmeditation.dart';
+import 'package:firebaseseries/screen/Recoommendedmeditation/recommendedmed1.dart';
+import 'package:firebaseseries/screen/Recoommendedmeditation/recommendedmed2.dart';
+import 'package:firebaseseries/screen/Recoommendedmeditation/recommendedmed3.dart';
+import 'package:firebaseseries/screen/Sportsmeditation/basketballmeditation.dart';
+import 'package:firebaseseries/screen/Sportsmeditation/cricketmeditation.dart';
+import 'package:firebaseseries/screen/Sportsmeditation/soccermeditation.dart';
+import 'package:firebaseseries/screen/Sportsmeditation/tennismeditation.dart';
 import 'package:firebaseseries/screen/meditationtask.dart';
-import 'package:firebaseseries/screen/meditation5.dart';
+import 'package:firebaseseries/screen/progress1.dart';
 import 'package:firebaseseries/screen/settings.dart';
 import 'package:firebaseseries/screen/widgets/custombox.dart';
 import 'package:firebaseseries/screen/widgets/sessionbox3.dart';
+import 'package:firebaseseries/services/Apidata.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebaseseries/screen/profile.dart';
@@ -14,8 +26,13 @@ import 'package:firebaseseries/screen/widgets/sessiobox.dart';
 import 'package:firebaseseries/screen/Explorescreen.dart';
 import 'package:firebaseseries/screen/sessions.dart';
 import 'package:firebaseseries/screen/utils/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class MeditationHomeScreen extends StatefulWidget {
+  const MeditationHomeScreen({
+    super.key,
+  });
+
   @override
   State<MeditationHomeScreen> createState() => _MeditationHomeScreenState();
 }
@@ -46,7 +63,7 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
         _onItemTapped(index);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: containerColor,
           borderRadius: BorderRadius.circular(12),
@@ -62,7 +79,7 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
                 child: Center(child: icon),
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
@@ -81,37 +98,35 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
     return Scaffold(
       backgroundColor: color1,
       body: _screens[_selectedIndex],
-      bottomNavigationBar: _selectedIndex == 3
-          ? null
-          : Container(
-              color: Colors.black,
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(
-                    Image.asset('assets/Vector 6.png', width: 24, height: 24),
-                    'Home',
-                    0,
-                  ),
-                  _buildNavItem(
-                    Image.asset('assets/icon2.png', width: 24, height: 24),
-                    'Sessions',
-                    1,
-                  ),
-                  _buildNavItem(
-                    Image.asset('assets/Frame.png', width: 24, height: 24),
-                    'Explore',
-                    2,
-                  ),
-                  _buildNavItem(
-                    Image.asset('assets/Icon.png', width: 24, height: 24),
-                    'Profile',
-                    3,
-                  ),
-                ],
-              ),
+      bottomNavigationBar: Container(
+        color: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(
+              Image.asset('assets/Vector 6.png', width: 24, height: 24),
+              'Home',
+              0,
             ),
+            _buildNavItem(
+              Image.asset('assets/icon2.png', width: 24, height: 24),
+              'Sessions',
+              1,
+            ),
+            _buildNavItem(
+              Image.asset('assets/Frame.png', width: 24, height: 24),
+              'Explore',
+              2,
+            ),
+            _buildNavItem(
+              Image.asset('assets/Icon.png', width: 24, height: 24),
+              'Profile',
+              3,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -145,7 +160,99 @@ final List<String> myImages = [
   "assets/designers_28349_A_realistic_image_of_a_cricket_player_in_acti_5f5bdbcf-76c2-4af8-aab5-aa16ddbd30a0_2.png",
 ];
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
+    super.key,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String greeting = "Good morning, Guest!";
+  String? userName;
+  int totalMeditationTime = 0;
+  int totalMeditationDays = 0;
+  int currentStreakDays = 0;
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  List<MeditationSession> _sessions = [];
+
+  Future<void> _fetchTotalTimeAndDays() async {
+    DatabaseReference _dbRef = FirebaseDatabase.instance
+        .ref()
+        .child("users")
+        .child("userId")
+        .child("meditation_session");
+
+    _dbRef.once().then((DatabaseEvent snapshot) {
+      Map<dynamic, dynamic> data =
+          snapshot.snapshot.value as Map<dynamic, dynamic>;
+
+      setState(() {
+        _sessions = data.entries.map((entry) {
+          return MeditationSession.fromMap(entry.value);
+        }).toList();
+
+        // Calculate total time and days
+        totalMeditationTime =
+            _sessions.fold(0, (sum, session) => sum + session.timeSpent);
+        totalMeditationDays = _sessions.length;
+
+        // Calculate current streak
+        if (_sessions.isNotEmpty) {
+          _sessions.sort((a, b) => a.date.compareTo(b.date)); // Sort by date
+          DateTime lastDate = _sessions.last.date; // Most recent session
+          currentStreakDays = 1; // Start with 1 for the last day
+
+          for (int i = _sessions.length - 2; i >= 0; i--) {
+            DateTime currentDate = _sessions[i].date;
+            if (lastDate.difference(currentDate).inDays == 1) {
+              currentStreakDays++;
+              lastDate = currentDate;
+            } else {
+              break; // Streak is broken
+            }
+          }
+        } else {
+          currentStreakDays = 0; // No sessions means no streak
+        }
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Assuming you have an instance of SignupProvider
+    final signupProvider = Provider.of<SignupProvider>(context, listen: false);
+    _fetchUserName(signupProvider);
+    _fetchTotalTimeAndDays();
+  }
+
+  Future<void> _fetchUserName(SignupProvider signupProvider) async {
+    await signupProvider.autoLogin(); // Call your autoLogin method
+
+    if (signupProvider.isLoggedIn) {
+      try {
+        DocumentSnapshot userData = await FirebaseFirestore.instance
+            .collection("users")
+            .doc(signupProvider.user!.uid)
+            .get();
+
+        // Cast the data to Map<String, dynamic>
+        final userMap = userData.data() as Map<String, dynamic>?;
+
+        userName = userMap?['name'] ?? "Guest"; // Use null-aware access
+        setState(() {
+          greeting = "Good morning, $userName!";
+        });
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,13 +266,13 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                   Container(
                     width: double.infinity,
                     height: 135,
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [
                           Color(0xffE67E22), // Light Orange
                           Color(0xff804613), // Dark Orange
@@ -178,7 +285,7 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Good Morning, Alex!",
+                          greeting,
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w600,
@@ -193,16 +300,16 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Container(
+                  const SizedBox(height: 16),
+                  SizedBox(
                     height: 48,
                     width: double.infinity,
                     child: Row(
                       children: [
-                        Container(
+                        SizedBox(
                           width: 269,
                           height: 25,
-                          child: Text(
+                          child: const Text(
                             "Your Progress",
                             style: TextStyle(
                               fontSize: 20,
@@ -215,21 +322,30 @@ class HomeScreen extends StatelessWidget {
                           height: 32,
                           width: 83,
                           decoration: BoxDecoration(
-                            color: Color(0xff000000),
+                            color: const Color(0xff000000),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
-                            child: Text(
-                              "View all",
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.white),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProgressScreen()));
+                              },
+                              child: Text(
+                                "View all",
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.white),
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -245,8 +361,8 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        top: 5,
-                        left: 203.5,
+                        top: 4,
+                        left: 205,
                         child: Container(
                           height: 100,
                           width: 157,
@@ -262,15 +378,15 @@ class HomeScreen extends StatelessWidget {
                           _buildMetricCard(
                             boxcolor: color3,
                             title: "Total Meditation Time",
-                            value: "2 hours",
-                            subValue: "+30 min",
+                            value: "$totalMeditationTime",
+                            subValue: "New Record",
                             backgroundColor: Colors.green,
                             textColor: Colors.white,
                           ),
                           _buildMetricCard(
                             boxcolor: color2,
                             title: "Meditation Streak",
-                            value: "5 days",
+                            value: "$totalMeditationDays",
                             subValue: "New Record!",
                             backgroundColor: Colors.transparent,
                             textColor: Colors.white,
@@ -279,9 +395,9 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -299,7 +415,7 @@ class HomeScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 "Sporty Minds - Mental Challenge Selection",
                                 style: TextStyle(
                                   fontSize: 18,
@@ -307,23 +423,23 @@ class HomeScreen extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               ElevatedButton(
                                 onPressed: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              meditationtask()));
+                                              MeditationTask()));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      Color(0xFFFFCB2D), // Yellow button
+                                      const Color(0xFFFFCB2D), // Yellow button
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   "Start Challenge",
                                   style: TextStyle(
                                     color: Colors.black,
@@ -342,7 +458,7 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -353,7 +469,7 @@ class HomeScreen extends StatelessWidget {
                 if (index >= title.length ||
                     index >= mypic.length ||
                     index >= myImages.length) {
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 }
 
                 return Padding(
@@ -373,7 +489,7 @@ class HomeScreen extends StatelessWidget {
               childCount: mypic.length, // Number of items
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(height: 20),
           ),
           SliverToBoxAdapter(
@@ -382,7 +498,7 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: RichText(
-                    text: TextSpan(children: [
+                    text: const TextSpan(children: [
                   TextSpan(
                       text: "Quick Session for all",
                       style: TextStyle(
@@ -390,14 +506,14 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: color6)),
                   TextSpan(
-                      text: "Sports",
+                      text: " Sports",
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: color6))
                 ])),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Padding(
@@ -406,38 +522,63 @@ class HomeScreen extends StatelessWidget {
                     titletext: "High Performance",
                     subtitletext: "Meditation",
                     lowertext: "Meditation: 15-20 minutes",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Quickmeditation()));
+                    },
                     Image1: "assets/Depth 4, Frame 1.png"),
               ),
-              SizedBox(
-                height: 10,
+              const SizedBox(
+                height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
+              const Padding(
+                padding: EdgeInsets.only(left: 10),
                 child: Text(
                   "Recommended Sessions",
                   style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w600, color: color2),
                 ),
               ),
-              SizedBox(
-                height: 5,
+              const SizedBox(
+                height: 20,
               ),
               CarouselSlider(
-                options: CarouselOptions(height: 250.0, autoPlay: true),
+                options: CarouselOptions(height: 300.0, autoPlay: true),
                 items: [
                   custombox(
-                      ImagePath: "assets/Image.png",
-                      titletext: "Recommended for relaxation",
-                      labeltext: "Calm Before the Match: 15 min"),
+                    ImagePath: "assets/Image.png",
+                    titletext: "Recommended for relaxation",
+                    labeltext: "Calm Before the Match: 15 min",
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => recommendedmed1()));
+                    },
+                  ),
                   custombox(
                       ImagePath: "assets/Image (1).png",
                       titletext: "Recommended for mental preparation",
-                      labeltext: "Pre-Match Focus"),
+                      labeltext: "Pre-Match Focus",
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => recommendedmed2()));
+                      }),
                   custombox(
-                      ImagePath: "assets/Image (2).png",
-                      titletext: "Mindful Breathing: 5 min",
-                      labeltext: "Visualizing Victory: 20 min")
+                    ImagePath: "assets/Image (2).png",
+                    titletext: "Mindful Breathing: 5 min",
+                    labeltext: "Visualizing Victory: 20 min",
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => recommendedmed3()));
+                    },
+                  )
                 ],
               )
             ]),
@@ -452,26 +593,26 @@ class HomeScreen extends StatelessWidget {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Meditation1()),
+          MaterialPageRoute(builder: (context) => tennismeditation()),
         );
         break;
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Meditation2()),
+          MaterialPageRoute(builder: (context) => soccermeditation()),
         );
         break;
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Meditation3()),
+          MaterialPageRoute(builder: (context) => basketballmeditation()),
         );
         break;
       // Add more cases for each screen you want to navigate to
       default:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Meditation4()),
+          MaterialPageRoute(builder: (context) => cricketmeditation()),
         );
     }
   }
@@ -491,7 +632,7 @@ class HomeScreen extends StatelessWidget {
         color: boxcolor,
         borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -502,7 +643,7 @@ class HomeScreen extends StatelessWidget {
               color: textColor,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
@@ -511,7 +652,7 @@ class HomeScreen extends StatelessWidget {
               color: textColor,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             subValue,
             style: TextStyle(
